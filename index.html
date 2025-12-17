@@ -4,41 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Math Hands</title>
-    <link rel="manifest" href="manifest.json">
-
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      // Points to the /math/ folder where your sw.js is located
-      navigator.serviceWorker.register('/math/sw.js');
-    });
-  }
-</script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f0f4f8; margin: 0; padding: 10px; touch-action: manipulation; }
         #exercise { font-size: 50px; margin: 10px; font-weight: 800; color: #2c3e50; }
         
-        /* Start Overlay - Necessary for Mobile Audio */
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); 
                    display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
         #start-btn { padding: 20px 40px; font-size: 30px; background: #3498db; color: white; border: none; border-radius: 50px; cursor: pointer; }
 
-        .game-container { display: flex; justify-content: center; gap: 10px; margin-top: 5px; }
+        .game-container { display: flex; justify-content: center; gap: 10px; margin-top: 5px; min-height: 210px; }
         .hand-wrapper { display: flex; flex-direction: column; align-items: center; }
         
         svg { width: 150px; height: 200px; transition: all 0.3s; touch-action: none; }
         .finger { fill: #ffdbac; stroke: #8d5524; stroke-width: 2; cursor: pointer; -webkit-tap-highlight-color: transparent; }
         .finger.counted { fill: #ffad60; }
-        .palm { fill: #ffdbac; stroke: #8d5524; stroke-width: 2; -webkit-tap-highlight-color: transparent; }
+        .palm { fill: #ffdbac; stroke: #8d5524; stroke-width: 2; cursor: pointer; -webkit-tap-highlight-color: transparent; }
         
         .finger-label { font-size: 24px; font-weight: bold; fill: #ffffff; pointer-events: none; text-shadow: 1px 1px 2px #000; }
         
-        #options-container { display: flex;     justify-content: center;
-    flex-wrap: wrap;
-    column-gap: 55px;
-    row-gap: 20px; visibility: hidden; }
+        #options-container { display: flex; justify-content: center; flex-wrap: wrap; column-gap: 55px; row-gap: 20px; visibility: hidden; }
         .vehicle-btn { display: flex; flex-direction: column; align-items: center; background: white; border: 3px solid #3498db; 
-                       border-radius: 15px; padding: 8px; width: 70px; -webkit-tap-highlight-color: transparent; }
+                       border-radius: 15px; padding: 8px; width: 70px; -webkit-tap-highlight-color: transparent; transition: transform 0.1s; }
+        .vehicle-btn:active { transform: scale(0.95); }
         .vehicle-btn .icon { font-size: 30px; }
         .vehicle-btn .num { font-size: 20px; font-weight: bold; }
 
@@ -47,7 +34,7 @@
         @media (min-width: 768px) {
             #exercise { font-size: 100px; }
             svg { width: 250px; height: 320px; }
-            .game-container { gap: 80px; }
+            .game-container { gap: 80px; min-height: 330px; }
             .vehicle-btn { width: 120px; padding: 20px; }
             .vehicle-btn .icon { font-size: 50px; }
             .vehicle-btn .num { font-size: 32px; }
@@ -66,39 +53,47 @@
         <div class="hand-wrapper"><svg id="leftHand" viewBox="0 0 200 250"></svg></div>
         <div class="hand-wrapper"><svg id="rightHand" viewBox="0 0 200 250"></svg></div>
     </div>
-    <div id="message">Count the fingers!</div>
+    <div id="message"></div>
     <div id="options-container"></div>
 
     <script>
         let num1 = 0, num2 = 0, globalCounter = 0, isTransitioning = false;
-        const vehicles = ['🚗', '🚕', '🚙', '🚌', '🏎️', '🚓', '🚑', '🚒', '🚜', '🚲', '🚂', '✈️', '🚀', '🚢'];
+        
+        // Expanded vehicles list
+        const vehicles = [
+            '🚗', '🚕', '🚙', '🚌', '🏎️', '🚓', '🚑', '🚒', '🚜', '🚲', '🚂', '✈️', '🚀', '🚢',
+            '🛵', '🏍️', '🛺', '🚁', '🛸', '🛶', '⛵', '🚤', '🛳️', '🚚', '🚛', '🛻', '🛴', '🛹', 
+            '🚠', '🚟', '🚋', '🛰️', '🏗️', '🚜', '🚆', '🚲', '🚐', '⛽'
+        ];
+
         const fingerData = [{x:20,y:80,w:28,h:75},{x:55,y:30,w:28,h:95},{x:90,y:10,w:28,h:105},{x:125,y:30,w:28,h:95},{x:160,y:70,w:28,h:65}];
 
         function startGame() {
             document.getElementById('overlay').style.display = 'none';
-            // Wake up speech engine
-            speak("Let's go!");
             newGame();
         }
 
-        function speak(text) {
+        function speak(text, callback) {
             window.speechSynthesis.cancel();
             const msg = new SpeechSynthesisUtterance(text);
             msg.lang = 'en-US';
+            if (callback) msg.onend = callback;
             window.speechSynthesis.speak(msg);
         }
 
         function drawHand(handId, fingerCount, isLeftHand) {
             const svg = document.getElementById(handId);
             svg.innerHTML = '';
+            if(fingerCount === 0) return;
+
             const palm = document.createElementNS("http://www.w3.org/2000/svg", "rect");
             palm.setAttribute("x", "30"); palm.setAttribute("y", "120");
             palm.setAttribute("width", "140"); palm.setAttribute("height", "100");
             palm.setAttribute("rx", "20");
-            palm.setAttribute("class", isLeftHand ? "palm clickable-palm" : "palm");
+            palm.setAttribute("class", "palm");
             
-            // Handle both click and touch for mobile
-            const handlePalm = () => { if(isLeftHand) countWholeHand(handId, fingerCount); };
+            // Logic for whole hand click
+            const handlePalm = () => countWholeHand(handId, fingerCount);
             palm.onclick = handlePalm;
             palm.ontouchstart = (e) => { e.preventDefault(); handlePalm(); };
             
@@ -122,7 +117,7 @@
             }
         }
 
-        function countSingleFinger(rect) {
+        function countSingleFinger(rect, silent = false) {
             if (rect.classList.contains('counted') || isTransitioning) return;
             globalCounter++;
             rect.classList.add('counted');
@@ -133,7 +128,8 @@
             text.setAttribute("class", "finger-label");
             text.textContent = globalCounter;
             svg.appendChild(text);
-            speak(globalCounter);
+            
+            if (!silent) speak(globalCounter);
             if (globalCounter === (num1 + num2)) showOptions();
         }
 
@@ -141,20 +137,23 @@
             if (isTransitioning) return;
             const svg = document.getElementById(handId);
             const uncounted = svg.querySelectorAll('.finger:not(.counted)');
+            
             if (uncounted.length > 0) {
-                speak(count);
-                uncounted.forEach(f => countSingleFinger(f));
+                // Determine if we should say the hand total or current count
+                // If it's the first hand, say its total.
+                speak(count); 
+                uncounted.forEach(f => countSingleFinger(f, true)); // 'true' makes it silent
             }
         }
 
         function showOptions() {
-            document.getElementById('message').textContent = "Pick the car!";
+            document.getElementById('message').textContent = "Pick the vehicle!";
             const container = document.getElementById('options-container');
             container.style.visibility = 'visible';
             container.innerHTML = '';
             const correct = num1 + num2;
             let choices = new Set([correct]);
-            while(choices.size < 4) choices.add(Math.floor(Math.random() * 9) + 2);
+            while(choices.size < 4) choices.add(Math.floor(Math.random() * 10) + 1);
 
             [...choices].sort(() => Math.random() - 0.5).forEach(num => {
                 const btn = document.createElement('div');
@@ -172,10 +171,10 @@
             const correct = num1 + num2;
             if (picked === correct) {
                 isTransitioning = true;
-                speak("Correct! " + correct);
+                speak(`Correct. ${num1} plus ${num2} is ${correct}`);
                 element.style.borderColor = "#4CAF50";
                 element.style.background = "#c8e6c9";
-                setTimeout(newGame, 1500);
+                setTimeout(newGame, 3000);
             } else {
                 speak("Try again!");
                 element.style.opacity = "0.3";
@@ -186,13 +185,21 @@
         function newGame() {
             isTransitioning = false;
             globalCounter = 0;
-            document.getElementById('message').textContent = "Count the fingers!";
+            document.getElementById('leftHand').innerHTML = '';
+            document.getElementById('rightHand').innerHTML = '';
+            document.getElementById('message').textContent = "";
             document.getElementById('options-container').style.visibility = 'hidden';
-            let a = Math.floor(Math.random() * 5) + 1, b = Math.floor(Math.random() * 5) + 1;
-            num1 = Math.max(a, b); num2 = Math.min(a, b);
+
+            num1 = Math.floor(Math.random() * 5) + 1;
+            num2 = Math.floor(Math.random() * 5) + 1;
+
             document.getElementById('exercise').textContent = `${num1} + ${num2} = ?`;
-            drawHand('leftHand', num1, true);
-            drawHand('rightHand', num2, false);
+
+            speak(`${num1} plus ${num2}`, () => {
+                drawHand('leftHand', num1, true);
+                drawHand('rightHand', num2, false);
+                document.getElementById('message').textContent = "Count the fingers!";
+            });
         }
     </script>
 </body>
