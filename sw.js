@@ -1,5 +1,9 @@
-const cacheName = 'v1';
-const cacheAssets = ['index.html', 'icon.png'];
+const cacheName = 'math-v1';
+const cacheAssets = [
+  '/math/',
+  '/math/index.html',
+  '/math/icon.png'
+];
 
 self.addEventListener('install', e => {
   e.waitUntil(

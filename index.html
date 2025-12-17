@@ -6,13 +6,14 @@
     <title>Math Hands</title>
     <link rel="manifest" href="manifest.json">
 
-    <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js');
-        });
-    }
-    </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      // Points to the /math/ folder where your sw.js is located
+      navigator.serviceWorker.register('/math/sw.js');
+    });
+  }
+</script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f0f4f8; margin: 0; padding: 10px; touch-action: manipulation; }
         #exercise { font-size: 50px; margin: 10px; font-weight: 800; color: #2c3e50; }
