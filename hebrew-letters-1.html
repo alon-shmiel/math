@@ -81,11 +81,6 @@ body {
   <button onclick="location.href='index.html'">🔙</button>
 </div>
 
-<div id="overlay">
-  <h1 style="color:#1565c0;">Hebrew Vehicles</h1>
-  <button class="btn" style="font-size:40px;" onclick="startGame()">▶ התחל</button>
-</div>
-
 <div id="game-container">
   <div class="letter-display" id="letter">א</div>
   <div class="vehicle-emoji" id="emoji" onclick="speakAll()">🚌</div>
@@ -105,7 +100,7 @@ const alphabet = [
   { char:'ג', w:'ג׳יפ', speakW:'גִ׳יפּ', e:'🚙' },
   { char:'ד', w:'דחפור', speakW:'דַּחְפּוֹר', e:'🏗️' },
   { char:'ה', w:'הליקופטר', speakW:'הֵלִיקוֹפְּטֶר', e:'🚁' },
-  { char:'ו', w:'ואן', speakW:'וואן', e:'🚐' },
+  { char:'ו', w:'ואן', speakW:'וָואן', e:'🚐' },
   { char:'ז', w:'זרוע', speakW:'זְרוֹעַ', e:'🏗️' },
   { char:'ח', w:'חללית', speakW:'חֲלָלִית', e:'🚀' },
   { char:'ט', w:'טרקטור', speakW:'טְרַקְטוֹר', e:'🚜' },
@@ -132,7 +127,7 @@ speechSynthesis.onvoiceschanged = () => {
 };
 
 function startGame() {
-  document.getElementById('overlay').style.display = 'none';
+//   document.getElementById('overlay').style.display = 'none';
   // Standard Chrome requirement: Resume AudioContext or Speech on user gesture
   if (speechSynthesis.paused) {
     speechSynthesis.resume();
@@ -177,6 +172,8 @@ function speakAll() {
   speechSynthesis.speak(letterMsg);
   speechSynthesis.speak(wordMsg);
 }
+
+startGame();
 </script>
 
 </body>
