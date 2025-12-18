@@ -127,6 +127,23 @@
             drawLetterMask(currentIndex);
         }
 
+
+        function speakLetter(letter) {
+            const currentLangKey = urlParams.get('lang') === 'en' ? 'en' : 'he';
+            const lang = urlParams.get('lang') === 'en' ? 'en-US' : 'he-IL';
+            speechSynthesis.cancel();
+
+            const voices = speechSynthesis.getVoices();
+            const voice = voices.find(v => v.lang.startsWith(currentLangKey));
+
+            const letterMsg = new SpeechSynthesisUtterance(letter.toLowerCase());
+            letterMsg.lang = lang;
+            if (voice) letterMsg.voice = voice;
+            letterMsg.rate = 0.9;
+
+            speechSynthesis.speak(letterMsg);
+        }
+
         function drawLetterMask(currentIndex) {
             const letter = isLowerCase ? letters[currentIndex].toLocaleLowerCase() : letters[currentIndex].toUpperCase();
             ctx.save();
@@ -143,6 +160,7 @@
             ctx.lineWidth = 2;
             ctx.strokeText(letter, canvas.width / 2, canvas.height / 2 + 30);
             ctx.restore();
+            speakLetter(letter);
         }
 
         function startPosition(e) {
