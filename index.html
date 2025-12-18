@@ -16,17 +16,24 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f0f4f8; margin: 0; padding: 10px; touch-action: manipulation; }
       
-        .game {
-            display: flex;
-            cursor: pointer;
-        }
+        .games {
+    display: flex;
+    flex-wrap: wrap;      /* Allows items to move to the next row */
+    gap: 20px;            /* Adds spacing between the images */
+    justify-content: center; /* Centers the grid on the screen */
+    padding: 20px;
+}
 
-        .game img {
-            width: 256px;
-            height: 256px;
-            border: 1px solid black;
-            margin: 5px;
-        }
+.game img {
+    width: 200px;         /* Set a consistent size for your images */
+    height: auto;
+    cursor: pointer;      /* Shows the hand icon on hover */
+    border-radius: 10px;  /* Optional: rounds the corners */
+    transition: transform 0.2s;
+    width: 128px;
+    height: 128px;
+}
+
     </style>
 </head>
 <body>
@@ -40,6 +47,15 @@
             </div>
             <div class="game">
                 <img src="english-letters-1.png" onclick="window.location.href = 'letters-1.html?lang=en'"/>
+            </div>
+            <div class="game">
+                <img src="writing-letters-alef-bet.png" onclick="window.location.href = 'writing-letters-1.html'"/>
+            </div>
+            <div class="game">
+                <img src="writing-ABC.png" onclick="window.location.href = 'writing-letters-1.html?lang=en'"/>
+            </div>
+            <div class="game">
+                <img src="writing-abc-lower.png" onclick="window.location.href = 'writing-letters-1.html?lang=en&lowerCase=true'"/>
             </div>
         </div>
     </div>
