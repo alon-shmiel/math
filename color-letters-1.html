@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magic Letter Tracer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=BBH+Hegarty&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="common.css">
@@ -93,6 +94,21 @@
             currentLangKey = 'en-US';
         } else if (type === 'shapes') {
             letters = ['●', '■', '▲', '★', '♥', '▬', '✿'];
+        } else if (type === 'vehicles') {
+            letters = [
+                '\uf206', // bicycle
+                '\uf1b9', // car
+                '\uf0fb', // helicopter
+                '\uf5b0', // truck-monster
+                '\uf072', // airplane
+                '\uf238', // train
+                '\uf207', // bus
+                '\uf21a', // ship
+                '\uf239', // tram
+                '\uf0d1', // truck
+                '\uf0f9', // ambulance
+                '\uf4df'  // tractor
+            ];
         }
 
 
@@ -103,7 +119,7 @@
 
         // Configuration
          // Change this to any letter or number
-        const fontSize = 450;
+        const fontSize = 380;
         let currentIndex = 0;
 
         function init() {
@@ -130,10 +146,13 @@
         function drawLetterMask(currentIndex) {
             const letter = letters[currentIndex];
             ctx.save();
-            ctx.font = `400 ${fontSize}px "BBH Hegarty", sans-serif`;
+         
+            // ctx.font = `400 ${fontSize}px "BBH Hegarty", sans-serif`;
+            ctx.font = `400 ${fontSize}px "Font Awesome 6 Free"`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
+            ctx.globalCompositeOperation = 'source-over';
             // Draw a very light gray letter as the base
             ctx.fillStyle = 'white'; 
             ctx.fillText(letter, canvas.width / 2, canvas.height / 2 + 30);
