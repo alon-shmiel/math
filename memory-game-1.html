@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Beep Beep! Memory</title>
+    <link rel="stylesheet" href="common.css">
     <style>
         :root {
             --bg-color: #f0f9ff;
@@ -11,25 +11,6 @@
             --primary-dark: #2980b9;
             --success: #2ecc71;
             --success-dark: #27ae60;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-            touch-action: manipulation;
-        }
-
-        #topbar { 
-            width: 100%;
-            display: flex; 
-            padding: 15px; 
-            box-sizing: border-box;
         }
 
         .btn-back {
@@ -46,8 +27,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 90%;
-            max-width: 600px;
             padding-bottom: 50px;
         }
 
@@ -174,13 +153,11 @@
     </div>
 
     <div class="game-container">
-        <h1>Beep Beep! Memory</h1>
-
         <div class="controls">
             <label>Number of cards:</label>
             <div class="nav-container">
                 <button class="arrow-btn" onclick="changeCount(-2)">-</button>
-                <input type="number" id="cardCount" value="6" min="2" max="30" step="2" readonly>
+                <input type="number" id="cardCount" value="6" min="2" max="18" step="2" readonly>
                 <button class="arrow-btn" onclick="changeCount(2)">+</button>
             </div>
             <div id="timer-hint"></div>
@@ -297,4 +274,5 @@
         startGame();
     </script>
 </body>
+<script src="disable-zoom.js"></script>
 </html>

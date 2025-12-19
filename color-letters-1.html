@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Letter Tracer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BBH+Hegarty&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="common.css">
+    <style>
+        h1 {
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            letter-spacing: 2px;
+        }
+
+        #canvas-container {
+            position: relative;
+            padding: 10px;
+        }
+
+        canvas {
+            border-radius: 20px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+        }
+
+.nav-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+        .hint {
+            margin-top: 15px;
+            color: #a4b0be;
+            font-size: 14px;
+        }
+
+        .btn-prev { background-color: black; color: white; }
+        .btn-next { background-color: black; color: white; }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="topbar">
+        <button class="btn" onclick="location.href='index.html'">🔙</button>
+    </div>
+
+    <div id="container">
+        <div id="canvas-container">
+            <canvas id="tracerCanvas" width="500" height="500"></canvas>
+        </div>
+
+        <div class="nav-container">
+            <button class="btn btn-prev" id="prev-btn" onclick="moveToNextLetter(-1)">◀</button>
+            <button class="btn btn-next" id="next-btn" onclick="moveToNextLetter(1)">▶</button>
+        </div>
+    </div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentLangKey = urlParams.get('lang') === 'en' ? 'en' : 'he';
+        const isLowerCase = urlParams.get('lowerCase') === 'true';
+
+        let letters = [
+            'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 
+            'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 
+            'ש', 'ת'
+        ];
+
+        if (currentLangKey === 'en') {
+            letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+        }
+
+        const canvas = document.getElementById('tracerCanvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        let hue = 0;
+
+        // Configuration
+         // Change this to any letter or number
+        const fontSize = 450;
+        let currentIndex = 0;
+
+        function init() {
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            drawLetterMask(currentIndex);
+        }
+
+
+        function speakLetter(letter) {
+            const currentLangKey = urlParams.get('lang') === 'en' ? 'en' : 'he';
+            const lang = urlParams.get('lang') === 'en' ? 'en-US' : 'he-IL';
+            speechSynthesis.cancel();
+
+            const voices = speechSynthesis.getVoices();
+            const voice = voices.find(v => v.lang.startsWith(currentLangKey));
+
+            const letterMsg = new SpeechSynthesisUtterance(letter.toLowerCase());
+            letterMsg.lang = lang;
+            if (voice) letterMsg.voice = voice;
+            letterMsg.rate = 0.9;
+
+            speechSynthesis.speak(letterMsg);
+        }
+
+        function drawLetterMask(currentIndex) {
+            const letter = isLowerCase ? letters[currentIndex].toLocaleLowerCase() : letters[currentIndex].toUpperCase();
+            ctx.save();
+            ctx.font = `400 ${fontSize}px "BBH Hegarty", sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Draw a very light gray letter as the base
+            ctx.fillStyle = '#f1f2f6'; 
+            ctx.fillText(letter, canvas.width / 2, canvas.height / 2 + 30);
+            
+            // Draw an outline so the user knows where the letter is
+            ctx.strokeStyle = '#dfe4ea';
+            ctx.lineWidth = 2;
+            ctx.strokeText(letter, canvas.width / 2, canvas.height / 2 + 30);
+            ctx.restore();
+            speakLetter(letter);
+        }
+
+        function startPosition(e) {
+            drawing = true;
+            draw(e);
+        }
+
+        function endPosition() {
+            drawing = false;
+            ctx.beginPath();
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+            const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+            ctx.save();
+            
+            // This is the "Magic" part: only draw where pixels already exist (the letter)
+            ctx.globalCompositeOperation = 'source-atop'; 
+
+            // Drawing the Rainbow Brush
+            ctx.strokeStyle = `hsl(${hue}, 100%, 60%)`;
+            ctx.lineWidth = 50; // Wide brush to make filling easier
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = `hsl(${hue}, 100%, 60%)`;
+            
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            
+            ctx.restore();
+
+            hue += 4; // Shift colors
+            if (hue >= 360) hue = 0;
+        }
+
+        function moveToNextLetter(nextIndex) {
+            currentIndex = currentIndex + nextIndex;
+            if (currentIndex === -1) {
+                currentIndex = letters.length - 1;
+            } else if (currentIndex === letters.length) {
+                currentIndex = 0;
+            }
+            clearCanvas(currentIndex);
+        }
+
+        function clearCanvas(index) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Reset composite mode to default before redrawing the mask
+            ctx.globalCompositeOperation = 'source-over';
+            drawLetterMask(index);
+        }
+
+        // Event Listeners for Mouse
+        canvas.addEventListener('mousedown', startPosition);
+        canvas.addEventListener('mouseup', endPosition);
+        canvas.addEventListener('mousemove', draw);
+
+        // Event Listeners for Touch (Mobile/Tablet)
+        canvas.addEventListener('touchstart', (e) => { 
+            e.preventDefault(); 
+            startPosition(e); 
+        }, {passive: false});
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            endPosition();
+        }, {passive: false});
+        
+        canvas.addEventListener('touchmove', (e) => { 
+            e.preventDefault(); 
+            draw(e); 
+        }, {passive: false});
+
+        // Start the app
+        init();
+    </script>
+</body>
+<script src="disable-zoom.js"></script>
+</html>
