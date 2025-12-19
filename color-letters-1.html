@@ -12,7 +12,7 @@
         body {
             overflow: hidden;
         }
-        
+
         h1 {
             margin-bottom: 10px;
             text-shadow: 0 0 10px rgba(255,255,255,0.5);
@@ -135,11 +135,11 @@
             ctx.textBaseline = 'middle';
             
             // Draw a very light gray letter as the base
-            ctx.fillStyle = '#f1f2f6'; 
+            ctx.fillStyle = 'white'; 
             ctx.fillText(letter, canvas.width / 2, canvas.height / 2 + 30);
             
             // Draw an outline so the user knows where the letter is
-            ctx.strokeStyle = '#dfe4ea';
+            ctx.strokeStyle = 'black';
             ctx.lineWidth = 2;
             ctx.strokeText(letter, canvas.width / 2, canvas.height / 2 + 30);
             ctx.restore();
