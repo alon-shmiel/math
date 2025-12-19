@@ -72,18 +72,25 @@
     </div>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const currentLangKey = urlParams.get('lang') === 'en' ? 'en' : 'he';
-        const isLowerCase = urlParams.get('lowerCase') === 'true';
-
-        let letters = [
-            'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 
-            'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 
-            'ש', 'ת'
-        ];
-
-        if (currentLangKey === 'en') {
+        const type = urlParams.get('type'); // Get 'hebrew', 'abc', or 'ABC'
+        let currentLangKey;
+        let letters;
+        if (type === 'hebrew') {
+            letters = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת'];
+            currentLangKey = 'he-IL';
+        } else if (type === 'abc') {
             letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+            currentLangKey = 'en-US';
+        } else if (type === 'ABC') {
+            letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+            currentLangKey = 'en-US';
+        }   else if (type === '123') {
+            letters = Array.from({ length: 100 }, (_, i) => (i + 1).toString());
+            currentLangKey = 'en-US';
+        } else if (type === 'shapes') {
+            letters = ['●', '■', '▲', '★', '♥', '▬', '✿'];
         }
+
 
         const canvas = document.getElementById('tracerCanvas');
         const ctx = canvas.getContext('2d');
@@ -103,15 +110,13 @@
 
 
         function speakLetter(letter) {
-            const currentLangKey = urlParams.get('lang') === 'en' ? 'en' : 'he';
-            const lang = urlParams.get('lang') === 'en' ? 'en-US' : 'he-IL';
             speechSynthesis.cancel();
 
             const voices = speechSynthesis.getVoices();
             const voice = voices.find(v => v.lang.startsWith(currentLangKey));
 
             const letterMsg = new SpeechSynthesisUtterance(letter.toLowerCase());
-            letterMsg.lang = lang;
+            letterMsg.lang = currentLangKey;
             if (voice) letterMsg.voice = voice;
             letterMsg.rate = 0.9;
 
@@ -119,7 +124,7 @@
         }
 
         function drawLetterMask(currentIndex) {
-            const letter = isLowerCase ? letters[currentIndex].toLocaleLowerCase() : letters[currentIndex].toUpperCase();
+            const letter = letters[currentIndex];
             ctx.save();
             ctx.font = `400 ${fontSize}px "BBH Hegarty", sans-serif`;
             ctx.textAlign = 'center';
@@ -134,7 +139,7 @@
             ctx.lineWidth = 2;
             ctx.strokeText(letter, canvas.width / 2, canvas.height / 2 + 30);
             ctx.restore();
-            speakLetter(letter);
+            currentLangKey && speakLetter(letter);
         }
 
         function startPosition(e) {
