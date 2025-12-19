@@ -52,7 +52,7 @@
   <div class="vehicle-emoji" id="emoji" onclick="speakAll()">-</div>
   <div class="word-display" id="word">-</div>
 
-  <div class="nav-container">
+  <div id="nav-container" class="nav-container">
     <button class="btn btn-prev" id="prev-btn" onclick="changeLetter(-1)">◀</button>
     <button class="btn" onclick="speakAll()">📢</button>
     <button class="btn btn-next" id="next-btn" onclick="changeLetter(1)">▶</button>
@@ -82,43 +82,43 @@ const languages = {
       { char:'ס', w:'סירה', speakW:'סִירָה', e:'⛵' },
       { char:'ע', w:'עגלה', speakW:'עֲגָלָה', e:'🛒' },
       { char:'פ', w:'פרארי', speakW:'פֶרָארִי', e:'🏎️' },
-      { char:'צ', w:'צוללת', speakW:'צוֹלֶלֶת', e:'🚢' },
+      { char:'צ', w:'צוללת', speakW:'צוֹלֶלֶת', e:'🤿' },
       { char:'ק', w:'קורקינט', speakW:'קוֹרְקִינֶט', e:'🛴' },
       { char:'ר', w:'רכבת', speakW:'רַכֶּבֶת', e:'🚂' },
       { char:'ש', w:'שברולט', speakW:'שֶׁבְרוֹלֶט', e:'🚗' },
-      { char:'ת', w:'תלת-אופן', speakW:'תלַת-אוֹפַן', e:'🚲' }
+      { char:'ת', w:'תלת-אופן', speakW:'תלַת-אוֹפַן', e:'🛺' }
     ]
   },
   en: {
-    dir: 'rtl',
+    dir: 'ltr',
     langCode: 'en-US',
     data: [
-      { char:'A a', w:'Ambulance', e:'🚑' },
-      { char:'B b', w:'Bus', e:'🚌' },
-      { char:'C c', w:'Car', e:'🚗' },
-      { char:'D d', w:'Dump Truck', e:'🚛' },
-      { char:'E e', w:'Engine', e:'🚂' },
-      { char:'F f', w:'Fire Truck', e:'🚒' },
-      { char:'G g', w:'Garbage Truck', e:'🗑️' },
-      { char:'H h', w:'Helicopter', e:'🚁' },
-      { char:'I i', w:'Icebreaker', e:'🚢' },
-      { char:'J j', w:'Jet', e:'🛩️' },
-      { char:'K k', w:'Kayak', e:'🛶' },
-      { char:'L l', w:'Lorry', e:'🚛' },
-      { char:'M m', w:'Motorcycle', e:'🏍️' },
-      { char:'N n', w:'Noodle Truck', e:'🍜🚚' },
-      { char:'O o', w:'Off-road Vehicle', e:'🚙' },
-      { char:'P p', w:'Police Car', e:'🚓' },
-      { char:'Q q', w:'Quad Bike', e:'🏍️' },
-      { char:'R r', w:'Rocket', e:'🚀' },
-      { char:'S s', w:'Submarine', e:'🛥️' },
-      { char:'T t', w:'Tractor', e:'🚜' },
-      { char:'U u', w:'Unicycle', e:'🛞' },
-      { char:'V v', w:'Van', e:'🚐' },
-      { char:'W w', w:'Wheelchair', e:'👩‍🦽' },
-      { char:'X x', w:'Xebec', e:'⛵' },
-      { char:'Y y', w:'Yacht', e:'🛥️' },
-      { char:'Z z', w:'Zeppelin', e:'🚡' }
+      { char: 'A a', w: 'Ambulance', e: '🚑' },
+      { char: 'B b', w: 'Bus', e: '🚌' },
+      { char: 'C c', w: 'Car', e: '🚗' },
+      { char: 'D d', w: 'Dump Truck', e: '🚛' },
+      { char: 'E e', w: 'Engine (Train)', e: '🚂' },
+      { char: 'F f', w: 'Fire Truck', e: '🚒' },
+      { char: 'G g', w: 'Garbage Truck', e: '🚛🗑️' },      // no real garbage-truck emoji
+      { char: 'H h', w: 'Helicopter', e: '🚁' },
+      { char: 'I i', w: 'Icebreaker', e: '🚢❄️' },        // no dedicated icebreaker
+      { char: 'J j', w: 'Jet', e: '✈️' },
+      { char: 'K k', w: 'Kayak', e: '🛶' },
+      { char: 'L l', w: 'Lorry', e: '🚚' },
+      { char: 'M m', w: 'Motorcycle', e: '🏍️' },
+      { char: 'N n', w: 'Noodle Truck', e: '🚚🍜' },
+      { char: 'O o', w: 'Off-road Vehicle', e: '🚙' },
+      { char: 'P p', w: 'Police Car', e: '🚓' },
+      { char: 'Q q', w: 'Quad Bike (ATV)', e: '🛺' },     // closest available
+      { char: 'R r', w: 'Rocket', e: '🚀' },
+      { char: 'S s', w: 'Submarine', e: '🤿' },            // no submarine emoji
+      { char: 'T t', w: 'Tractor', e: '🚜' },
+      { char: 'U u', w: 'Unicycle', e: '🛞' },             // closest match
+      { char: 'V v', w: 'Van', e: '🚐' },
+      { char: 'W w', w: 'Wheelchair', e: '🦽' },
+      { char: 'X x', w: 'Xebec', e: '⛵' },
+      { char: 'Y y', w: 'Yacht', e: '🛥️' },
+      { char: 'Z z', w: 'Zeppelin', e: '🛸' }              // closest (no airship emoji)
     ]
   }
 };
@@ -135,10 +135,8 @@ function init() {
   document.getElementById('html-tag').setAttribute('lang', currentLangKey);
   document.getElementById('body-tag').className = config.dir;
   
-  // Mirror arrows if it's LTR
-  if (config.dir === 'ltr') {
-    document.getElementById('prev-btn').classList.add('mirror');
-    document.getElementById('next-btn').classList.add('mirror');
+  if (config.dir === 'rtl') {
+    document.getElementById('nav-container').classList.add('mirror');
   }
 
   updateDisplay();
