@@ -76,10 +76,16 @@
         </div>
     </div>
     <script>
+        // Configuration
+         // Change this to any letter or number
+        const fontSize = 380;
+        let currentIndex = 0;
+
         const urlParams = new URLSearchParams(window.location.search);
         const type = urlParams.get('type'); // Get 'hebrew', 'abc', or 'ABC'
         let currentLangKey;
         let letters;
+        let isFontAwesomeNeeded = false;
         if (type === 'hebrew') {
             letters = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת'];
             currentLangKey = 'he-IL';
@@ -109,18 +115,14 @@
                 '\uf0f9', // ambulance
                 '\uf4df'  // tractor
             ];
+            isFontAwesomeNeeded = true;
         }
-
 
         const canvas = document.getElementById('tracerCanvas');
         const ctx = canvas.getContext('2d');
         let drawing = false;
         let hue = 0;
 
-        // Configuration
-         // Change this to any letter or number
-        const fontSize = 380;
-        let currentIndex = 0;
 
         function init() {
             ctx.lineJoin = 'round';
@@ -148,7 +150,19 @@
             ctx.save();
          
             // ctx.font = `400 ${fontSize}px "BBH Hegarty", sans-serif`;
-            ctx.font = `400 ${fontSize}px "Font Awesome 6 Free"`;
+            // ctx.font = `900 ${fontSize}px "Font Awesome 6 Free"`;
+
+            if (type === 'vehicles') {
+                // Use Font Awesome for icons
+                ctx.font = `900 ${fontSize}px "Font Awesome 6 Free"`;
+            } else if (type === 'hebrew' || type === 'abc' || type === 'ABC') {
+                // Use your learning font for letters
+                // Note: 400 weight is usually better for standard letters
+                ctx.font = `400 ${fontSize}px "BBH Hegarty", sans-serif`;
+            } else {
+                // Fallback for numbers and shapes
+                ctx.font = `400 ${fontSize}px sans-serif`;
+            }
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
@@ -243,7 +257,16 @@
         }, {passive: false});
 
         // Start the app
-        init();
+        // init();
+
+        if (isFontAwesomeNeeded) {
+            document.fonts.load(`900 ${fontSize}px "Font Awesome 6 Free"`).then(() => {
+                console.log("Font Awesome loaded, starting game...");
+                init();
+            });
+        } else {
+            init();
+        }
     </script>
 </body>
 <script src="disable-zoom.js"></script>
