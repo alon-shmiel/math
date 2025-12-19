@@ -192,7 +192,7 @@
         function changeCount(amount) {
             const input = document.getElementById('cardCount');
             let val = parseInt(input.value) + amount;
-            if (val >= 2 && val <= 30) {
+            if (val >= 2 && val <= 18) {
                 input.value = val;
                 debouncedStart();
             }
