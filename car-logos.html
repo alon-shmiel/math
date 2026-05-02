@@ -2,19 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Car Logo Scramble</title>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             background-color: #f4f7f6;
             margin: 0;
             padding: 20px;
-            touch-action: none;
+            min-height: 100vh;
+            touch-action: none; /* Prevents pull-to-refresh and vertical scrolling issues */
         }
 
         #game-container {
@@ -26,6 +32,9 @@
             text-align: center;
             max-width: 450px;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         /* The Skip Button */
@@ -46,6 +55,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
         }
 
         #car-image {
@@ -55,6 +65,13 @@
             margin-bottom: 25px;
         }
 
+        #interaction-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .slots-row {
             display: flex;
             justify-content: center;
@@ -62,6 +79,7 @@
             margin-bottom: 35px;
             min-height: 60px;
             flex-wrap: wrap;
+            width: 100%;
         }
 
         .slot {
@@ -82,6 +100,7 @@
             border-radius: 12px;
             min-height: 60px;
             flex-wrap: wrap;
+            width: 100%;
         }
 
         .letter-tile {
@@ -105,50 +124,94 @@
             font-weight: bold;
             color: #28a745;
         }
+
+        /* Landscape Mode Support */
+        @media (orientation: landscape) and (max-height: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            #game-container {
+                flex-direction: row;
+                max-width: 700px;
+                padding: 15px 25px;
+            }
+
+            #car-image {
+                width: 40%;
+                height: 120px;
+                margin-bottom: 0;
+                margin-right: 20px;
+            }
+
+            #interaction-area {
+                width: 60%;
+            }
+
+            .slots-row {
+                margin-bottom: 15px;
+                min-height: 50px;
+            }
+
+            .letters-pool {
+                padding: 10px;
+                min-height: 50px;
+            }
+
+            .slot {
+                height: 45px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <!-- <button id="skip-btn" onclick="nextLogo()">X</button> -->
+    <!-- <button id="skip-btn" onclick="init()">X</button> -->
     <img id="car-image" src="" alt="Logo">
-    <div class="slots-row" id="slots-container"></div>
-    <div class="letters-pool" id="pool"></div>
-    <div id="status"></div>
+    <div id="interaction-area">
+        <div class="slots-row" id="slots-container"></div>
+        <div class="letters-pool" id="pool"></div>
+        <div id="status"></div>
+    </div>
 </div>
 
 <script>
     const cars = [
         { name: 'AUDI', img: 'logos/audi.png' },
-        // { name: 'RAM', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Mercedes-Logo.svg/640px-Mercedes-Logo.svg.png' },
-        // { name: 'OPEL', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Chevrolet-logo.svg/640px-Chevrolet-logo.svg.png' },
-        // { name: 'SEAT', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Mitsubishi_logo.svg/640px-Mitsubishi_logo.svg.png' },
+        { name: 'RAM', img: 'logos/ram.png' },
+        { name: 'OPEL', img: 'logos/opel.png' },
+        { name: 'SEAT', img: 'logos/seat.png' },
         { name: 'LADA', img: 'logos/lada.png' },
     ];
 
-    let currentCar = 0;
+    let currentCarObj = null;
     const pool = document.getElementById('pool');
 
     function init() {
-        // random car that correct is false
         // shuffle the cars array
         cars.sort(() => Math.random() - 0.5);
         const availableCars = cars.filter(car => !car.correct);
+        
         if (availableCars.length === 0) {
             document.getElementById('status').innerText = "Congratulations! You've completed all logos!";
+            document.getElementById('slots-container').innerHTML = '';
+            pool.innerHTML = '';
+            document.getElementById('car-image').style.display = 'none';
             return;
         }
-        const car = availableCars[0];
+        
+        currentCarObj = availableCars[0];
         const slotsContainer = document.getElementById('slots-container');
         const img = document.getElementById('car-image');
         document.getElementById('status').innerText = "";
 
-        img.src = car.img;
+        img.src = currentCarObj.img;
         slotsContainer.innerHTML = '';
         pool.innerHTML = '';
 
         // Create Slots
-        for (let i = 0; i < car.name.length; i++) {
+        for (let i = 0; i < currentCarObj.name.length; i++) {
             const slot = document.createElement('div');
             slot.className = 'slot';
             slotsContainer.appendChild(slot);
@@ -167,7 +230,7 @@
         }
 
         // Create Scrambled Letters
-        const scrambled = car.name.split('').sort(() => Math.random() - 0.5);
+        const scrambled = currentCarObj.name.split('').sort(() => Math.random() - 0.5);
         scrambled.forEach(char => {
             const tile = document.createElement('div');
             tile.className = 'letter-tile';
@@ -194,16 +257,11 @@
             }
         });
 
-        if (filled === cars[currentCar].name.length && guess === cars[currentCar].name) {
+        if (filled === currentCarObj.name.length && guess === currentCarObj.name) {
             document.getElementById('status').innerText = "Correct!";
-            cars[currentCar].correct = true;
-            setTimeout(nextLogo, 1200);
+            currentCarObj.correct = true;
+            setTimeout(init, 1200);
         }
-    }
-
-    function nextLogo() {
-        currentCar = (currentCar + 1) % cars.length;
-        init();
     }
 
     init();
