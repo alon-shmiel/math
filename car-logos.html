@@ -11,7 +11,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -20,155 +20,153 @@
             margin: 0;
             padding: 20px;
             min-height: 100vh;
-            touch-action: none; /* Prevents pull-to-refresh and vertical scrolling issues */
+            touch-action: none;
         }
 
         #game-container {
             position: relative;
             background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
             text-align: center;
-            max-width: 450px;
+            max-width: 750px; 
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* The Skip Button */
-        #skip-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 35px;
-            height: 35px;
-            background: #ff4d4d;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-weight: bold;
+        #top-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        #controls {
             font-size: 18px;
-            cursor: pointer;
+            font-weight: bold;
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 10;
+            gap: 10px;
+            color: #444;
+        }
+
+        #controls input {
+            transform: scale(1.6);
+            cursor: pointer;
+        }
+
+        .nav-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover {
+            background-color: #5a6268;
         }
 
         #car-image {
             width: 100%;
-            height: 150px;
+            height: 200px;
             object-fit: contain;
-            margin-bottom: 25px;
-        }
-
-        #interaction-area {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin-bottom: 40px;
         }
 
         .slots-row {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 35px;
-            min-height: 60px;
+            gap: 20px;
+            margin-bottom: 60px;
+            min-height: 120px;
             flex-wrap: wrap;
             width: 100%;
         }
 
         .slot {
-            width: 45px;
-            height: 55px;
-            border-bottom: 3px solid #ced4da;
+            width: 100px;
+            height: 110px;
+            border-bottom: 8px solid #adb5bd;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+
+        .slot::before {
+            content: attr(data-hint);
+            position: absolute;
+            font-size: 50px;
+            font-weight: bold;
+            color: #e9ecef;
+            display: none;
+            pointer-events: none;
+        }
+
+        body.show-hints .slot::before {
+            display: block;
         }
 
         .letters-pool {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            padding: 20px;
+            gap: 20px;
+            padding: 40px;
             background: #f8f9fa;
-            border-radius: 12px;
-            min-height: 60px;
+            border-radius: 25px;
+            min-height: 120px;
             flex-wrap: wrap;
             width: 100%;
         }
 
         .letter-tile {
-            width: 45px;
-            height: 45px;
+            width: 100px;
+            height: 100px;
             background-color: #007bff;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 55px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 15px;
             cursor: grab;
-            box-shadow: 0 3px 0 #0056b3;
+            box-shadow: 0 6px 0 #0056b3;
+            z-index: 5;
         }
 
         #status {
-            margin-top: 15px;
-            height: 25px;
+            margin-top: 30px;
+            height: 40px;
+            font-size: 28px;
             font-weight: bold;
             color: #28a745;
         }
-
-        /* Landscape Mode Support */
-        @media (orientation: landscape) and (max-height: 600px) {
-            body {
-                padding: 10px;
-            }
-
-            #game-container {
-                flex-direction: row;
-                max-width: 700px;
-                padding: 15px 25px;
-            }
-
-            #car-image {
-                width: 40%;
-                height: 120px;
-                margin-bottom: 0;
-                margin-right: 20px;
-            }
-
-            #interaction-area {
-                width: 60%;
-            }
-
-            .slots-row {
-                margin-bottom: 15px;
-                min-height: 50px;
-            }
-
-            .letters-pool {
-                padding: 10px;
-                min-height: 50px;
-            }
-
-            .slot {
-                height: 45px;
-            }
-        }
     </style>
 </head>
-<body>
+<body id="body-tag">
 
 <div id="game-container">
-    <!-- <button id="skip-btn" onclick="init()">X</button> -->
+    <div id="top-bar">
+        <button class="nav-btn" id="prev-btn" onclick="changeLevel(-1)">← Prev</button>
+        <div id="controls">
+            <input type="checkbox" id="hint-checkbox" onchange="toggleHints()">
+            <label for="hint-checkbox">Hints</label>
+        </div>
+        <button class="nav-btn" id="next-btn" onclick="changeLevel(1)">Next →</button>
+    </div>
+
     <img id="car-image" src="" alt="Logo">
+    
     <div id="interaction-area">
         <div class="slots-row" id="slots-container"></div>
         <div class="letters-pool" id="pool"></div>
@@ -185,27 +183,37 @@
         { name: 'LADA', img: 'logos/lada.png' },
     ];
 
+    let currentIndex = 0;
     let currentCarObj = null;
-    const pool = document.getElementById('pool');
 
-    function init() {
-        // shuffle the cars array
-        cars.sort(() => Math.random() - 0.5);
-        const availableCars = cars.filter(car => !car.correct);
+    function applySavedPrefs() {
+        const hintPref = localStorage.getItem('carGameShowHints') === 'true';
+        document.getElementById('hint-checkbox').checked = hintPref;
+        document.getElementById('body-tag').classList.toggle('show-hints', hintPref);
+    }
+
+    function toggleHints() {
+        const isChecked = document.getElementById('hint-checkbox').checked;
+        document.getElementById('body-tag').classList.toggle('show-hints', isChecked);
+        localStorage.setItem('carGameShowHints', isChecked);
+    }
+
+    function changeLevel(direction) {
+        currentIndex += direction;
+        if (currentIndex < 0) currentIndex = cars.length - 1;
+        if (currentIndex >= cars.length) currentIndex = 0;
+        loadLevel();
+    }
+
+    function loadLevel() {
+        currentCarObj = cars[currentIndex];
         
-        if (availableCars.length === 0) {
-            document.getElementById('status').innerText = "Congratulations! You've completed all logos!";
-            document.getElementById('slots-container').innerHTML = '';
-            pool.innerHTML = '';
-            document.getElementById('car-image').style.display = 'none';
-            return;
-        }
-        
-        currentCarObj = availableCars[0];
         const slotsContainer = document.getElementById('slots-container');
+        const pool = document.getElementById('pool');
         const img = document.getElementById('car-image');
-        document.getElementById('status').innerText = "";
-
+        const status = document.getElementById('status');
+        
+        status.innerText = "";
         img.src = currentCarObj.img;
         slotsContainer.innerHTML = '';
         pool.innerHTML = '';
@@ -214,6 +222,7 @@
         for (let i = 0; i < currentCarObj.name.length; i++) {
             const slot = document.createElement('div');
             slot.className = 'slot';
+            slot.setAttribute('data-hint', currentCarObj.name[i]);
             slotsContainer.appendChild(slot);
             
             new Sortable(slot, {
@@ -221,17 +230,32 @@
                 animation: 150,
                 onAdd: function (evt) {
                     if (evt.to.children.length > 1) {
-                        const existingLetter = Array.from(evt.to.children).find(el => el !== evt.item);
-                        pool.appendChild(existingLetter);
+                        const newItem = evt.item;
+                        const oldItem = Array.from(evt.to.children).find(el => el !== newItem);
+                        
+                        if (evt.from.classList.contains('slot')) {
+                            evt.from.appendChild(oldItem);
+                        } else {
+                            pool.appendChild(oldItem);
+                        }
                     }
                     checkAnswer();
                 }
             });
         }
 
-        // Create Scrambled Letters
-        const scrambled = currentCarObj.name.split('').sort(() => Math.random() - 0.5);
-        scrambled.forEach(char => {
+        // Guaranteed Scramble Logic
+        let scrambledLetters = currentCarObj.name.split('');
+        
+        // Keep shuffling until the scrambled version is NOT equal to the original name
+        // (Only if word length > 1)
+        if (scrambledLetters.length > 1) {
+            do {
+                scrambledLetters.sort(() => Math.random() - 0.5);
+            } while (scrambledLetters.join('') === currentCarObj.name);
+        }
+
+        scrambledLetters.forEach(char => {
             const tile = document.createElement('div');
             tile.className = 'letter-tile';
             tile.innerText = char;
@@ -259,12 +283,18 @@
 
         if (filled === currentCarObj.name.length && guess === currentCarObj.name) {
             document.getElementById('status').innerText = "Correct!";
-            currentCarObj.correct = true;
-            setTimeout(init, 1200);
+            setTimeout(() => {
+                if (currentIndex < cars.length - 1) {
+                    changeLevel(1);
+                } else {
+                    document.getElementById('status').innerText = "All Logos Completed!";
+                }
+            }, 1500);
         }
     }
 
-    init();
+    applySavedPrefs();
+    loadLevel();
 </script>
 
 </body>
