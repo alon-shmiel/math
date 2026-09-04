@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Special Reveal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sky-blue: #0ea5e9;
+      --deep-sky: #0284c7;
+      --gold: #f59e0b;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --error: #ef4444;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1e293b, #0f172a);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1.5rem 1rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .bg-clouds {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 80%, rgba(255,255,255,0.05) 0%, transparent 40%);
+    }
+
+    .ticket {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 2px dashed #cbd5e1;
+    }
+
+    /* Boarding Ticket Notches */
+    .ticket::before, .ticket::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 24px;
+      height: 24px;
+      background-color: #0f172a;
+      border-radius: 50%;
+      z-index: 5;
+    }
+    .ticket::before { left: -12px; transform: translateY(-50%); }
+    .ticket::after { right: -12px; transform: translateY(-50%); }
+
+    /* Header Design */
+    .ticket-header {
+      background: linear-gradient(135deg, var(--sky-blue), var(--deep-sky));
+      color: white;
+      padding: 1.25rem 1rem;
+      border-bottom: 2px dashed rgba(255, 255, 255, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .ticket-header h1 {
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.95;
+    }
+
+    .ticket-header .tag {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+      display: none; /* Hidden by default until destination page */
+    }
+
+    .ticket-body {
+      padding: 2rem 1.75rem;
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out forwards;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.25rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.85rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      text-align: center;
+      letter-spacing: 2px;
+      font-family: 'Space Mono', monospace;
+      text-transform: uppercase;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--sky-blue);
+    }
+
+    button {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold) 0%, #d97706 100%);
+      color: white;
+      border: none;
+      padding: 0.85rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+    }
+
+    .error {
+      color: var(--error);
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .status-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1.25rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      background: #f1f5f9;
+      position: relative;
+    }
+
+    .status-icon.loading::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: var(--sky-blue);
+      animation: spin 1s linear infinite;
+    }
+
+    .status-icon.done {
+      background: #dcfce7;
+      color: var(--success);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      margin-top: 1.5rem;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--sky-blue);
+      width: 0%;
+      animation: progress 3.5s linear forwards;
+    }
+
+    @keyframes progress {
+      to { width: 100%; }
+    }
+
+    .hero-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    .flight-pass {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-top: 1rem;
+      text-align: left;
+    }
+
+    .flight-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .flight-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .flight-val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-clouds"></div>
+
+<div class="ticket">
+  <div id="ticketHeader" class="ticket-header">
+    <h1 id="headerTitle">Birthday Edition</h1>
+    <div id="headerTag" class="tag">✈️ SPECIAL TRIP REVEAL 🎂</div>
+  </div>
+
+  <div class="ticket-body">
+    <div id="page1" class="page active">
+      <div class="hero-icon">❤️</div>
+      <h2>Quiz!</h2>
+      <p>Enter the first day we met</p>
+      <div class="input-group">
+        <input type="text" id="dateInput" placeholder="DDMMYYYY" maxlength="8">
+        <p id="error1" class="error">Incorrect date. Try again!</p>
+      </div>
+      <button onclick="checkDate()">Continue</button>
+    </div>
+
+    <div id="stepPage1" class="page">
+      <div class="status-icon loading" id="icon1">📝</div>
+      <h2 id="title1">Requesting Days Off</h2>
+      <p id="desc1">Awaiting manager stamp...</p>
+      <div class="progress-bar"><div id="fill1" class="progress-fill"></div></div>
+    </div>
+
+    <div id="stepPage2" class="page">
+      <div class="status-icon loading" id="icon2">✈️</div>
+      <h2 id="title2">Booking Flights</h2>
+      <p id="desc2">Selecting window seats with extra legroom...</p>
+      <div class="progress-bar"><div id="fill2" class="progress-fill"></div></div>
+    </div>
+
+    <div id="stepPage3" class="page">
+      <div class="status-icon loading" id="icon3">🏨</div>
+      <h2 id="title3">Reserving Hotel</h2>
+      <p id="desc3">Adding birthday champagne to room...</p>
+      <div class="progress-bar"><div id="fill3" class="progress-fill"></div></div>
+    </div>
+
+    <div id="page3" class="page">
+      <div class="hero-icon">🌍</div>
+      <h2>Guess the Destination</h2>
+      <p>Type your guess below to confirm your seat!</p>
+      <div class="input-group">
+        <input type="text" id="destInput" placeholder="CITY NAME...">
+        <p id="error3" class="error">Not quite! Take another guess.</p>
+      </div>
+      <button onclick="checkDestination()">Confirm Destination</button>
+    </div>
+
+    <div id="page4" class="page">
+      <div class="hero-icon">🎉</div>
+      <h2>Happy Birthday!</h2>
+      <p>Get ready to fly! Here are your ticket details:</p>
+      
+      <div class="flight-pass">
+        <div class="flight-row">
+          <div>
+            <div class="flight-label">Destination</div>
+            <div class="flight-val">DUBAI (DXB)</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="flight-label">Class</div>
+            <div class="flight-val">FIRST / VIP</div>
+          </div>
+        </div>
+        <div class="flight-row" style="margin-bottom: 0;">
+          <div>
+            <div class="flight-label">Departure</div>
+            <div class="flight-val">26/09/2026</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="flight-label">Return</div>
+            <div class="flight-val">02/10/2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+  }
+
+  function checkDate() {
+    const input = document.getElementById('dateInput').value.trim();
+    if (input === '11062013') {
+      document.getElementById('error1').style.display = 'none';
+      // Transition header title to Boarding Pass • Birthday Edition
+      document.getElementById('headerTitle').textContent = 'Birthday Edition';
+      startStepSequence();
+    } else {
+      document.getElementById('error1').style.display = 'block';
+    }
+  }
+
+  function startStepSequence() {
+    showPage('stepPage1');
+
+    setTimeout(() => {
+      document.getElementById('icon1').className = 'status-icon done';
+      document.getElementById('icon1').textContent = '✓';
+      document.getElementById('title1').textContent = 'Approved!';
+      document.getElementById('desc1').textContent = 'Leave approved. Time to celebrate!';
+    }, 2800);
+
+    setTimeout(() => { showPage('stepPage2'); }, 3500);
+
+    setTimeout(() => {
+      document.getElementById('icon2').className = 'status-icon done';
+      document.getElementById('icon2').textContent = '✓';
+      document.getElementById('title2').textContent = 'Flights Booked!';
+      document.getElementById('desc2').textContent = 'Boarding passes issue confirmed.';
+    }, 6300);
+
+    setTimeout(() => { showPage('stepPage3'); }, 7000);
+
+    setTimeout(() => {
+      document.getElementById('icon3').className = 'status-icon done';
+      document.getElementById('icon3').textContent = '✓';
+      document.getElementById('title3').textContent = 'Hotel Reserved!';
+      document.getElementById('desc3').textContent = 'VIP Suite secured.';
+    }, 9800);
+
+    // Show full header on Destination page
+    setTimeout(() => { 
+      document.getElementById('headerTag').style.display = 'block';
+      showPage('page3'); 
+    }, 10500);
+  }
+
+  function checkDestination() {
+    const input = document.getElementById('destInput').value.trim().toLowerCase();
+    if (input === 'dubai') {
+      document.getElementById('error3').style.display = 'none';
+      showPage('page4');
+    } else {
+      document.getElementById('error3').style.display = 'block';
+    }
+  }
+</script>
+
+</body>
+</html>
