@@ -301,12 +301,120 @@
       text-align: center;
       padding: 1.5rem 1rem;
       border-radius: 12px;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .itinerary-header h1 {
       margin: 0;
       font-size: 1.6rem;
+    }
+
+    /* Allergy Button Style */
+    .allergy-btn {
+      background: #ef4444;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+
+    .allergy-btn:hover {
+      background: #dc2626;
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+    }
+
+    /* Allergy Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 1.5rem;
+      position: relative;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+      text-align: left;
+      direction: ltr;
+    }
+
+    .modal-close-btn {
+      background: #f1f5f9;
+      color: #0f172a;
+      border: none;
+      font-size: 1.25rem;
+      font-weight: bold;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+    }
+
+    .modal-close-btn:hover {
+      background: #e2e8f0;
+      transform: none;
+    }
+
+    .allergy-box {
+      border: 2px solid #fee2e2;
+      background: #fef2f2;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .allergy-box h3 {
+      color: #991b1b;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .allergy-box p {
+      color: #1e293b;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .allergy-box.arabic {
+      direction: rtl;
+      text-align: right;
+    }
+
+    .allergy-box.arabic h3 {
+      color: #991b1b;
     }
 
     .hotel-badge {
@@ -495,17 +603,20 @@
       <button onclick="showItinerary()">View Travel Itinerary 🗺️</button>
     </div>
 
-    <!-- Itinerary View -->
     <div id="itineraryPage" class="page itinerary-view">
       <div class="itinerary-header">
         <h1>תוכנית יומית (26.09 – 02.10) 🇦🇪</h1>
       </div>
 
+      <button class="allergy-btn" onclick="openAllergyModal()">
+        <span>⚠️</span>
+        <span>כרטיס אלרגיה למזון (Allergy Card)</span>
+      </button>
+
       <div class="hotel-badge">
         🏨 מלון מוצא: InterContinental Residences Dubai Business Bay
       </div>
 
-      <!-- יום ראשון -->
       <div class="day-card">
         <h2 class="day-title">יום ראשון (27.09) – חקירה, מים ויער גשם מקורה</h2>
         <ul class="timeline">
@@ -540,7 +651,6 @@
         </a>
       </div>
 
-      <!-- יום שני -->
       <div class="day-card">
         <h2 class="day-title">יום שני (28.09) – מתחם דובאי מול: אקווריום, מכוניות ומזרקות</h2>
         <ul class="timeline">
@@ -586,7 +696,6 @@
         </a>
       </div>
 
-      <!-- יום שלישי -->
       <div class="day-card">
         <h2 class="day-title">יום שלישי (29.09) – פארק לגולנד ופארק מים</h2>
         <ul class="timeline">
@@ -621,7 +730,6 @@
         </a>
       </div>
 
-      <!-- יום רביעי -->
       <div class="day-card">
         <h2 class="day-title">יום רביעי (30.09) – שלג במדבר וחוויות באטלנטיס</h2>
         <ul class="timeline">
@@ -656,7 +764,6 @@
         </a>
       </div>
 
-      <!-- יום חמישי -->
       <div class="day-card">
         <h2 class="day-title">יום חמישי (01.10) – פארק משחקים מקורה, אורות ופתיחת עונה</h2>
         <ul class="timeline">
@@ -694,6 +801,26 @@
   </div>
 </div>
 
+<div id="allergyModal" class="modal-overlay" onclick="closeAllergyModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="closeAllergyModal()">✕</button>
+    
+    <div class="allergy-box">
+      <h3>⚠️ Severe Food Allergy Warning</h3>
+      <p>My child is severely allergic to <strong>Sesame</strong> (including sesame seeds, sesame oil, and tahini), <strong>Hazenluts/Tree Nuts</strong>, and <strong>Fish</strong>.</p>
+      <p style="margin-top: 0.5rem;">Please ensure that no ingredients contain these allergens, and that all food is prepared with clean utensils to prevent cross-contamination.</p>
+      <p style="margin-top: 0.5rem;">Please check hamburger buns for sesame seeds or cross-contact, and verify that fries are not cooked in oil used for fish. Thank you!</p>
+    </div>
+
+    <div class="allergy-box arabic">
+      <h3>⚠️ تحذير: حساسية طعام شديدة</h3>
+      <p>طفلي يعاني من حساسية شديدة ومفرطة تجاه: <strong>السمسم</strong> (بما في ذلك بذور السمسم، زيت السمسم، والطحينة)، <strong>البندق/المكسرات</strong>، ו<strong>الأسماك</strong>.</p>
+      <p style="margin-top: 0.5rem;">يرجى التأكد التام من خلو جميع المكونات من هذه المواد، وإعداد الطعام باستخدام أدوات نظيفة لمنع التلوث الخلطي.</p>
+      <p style="margin-top: 0.5rem;">يرجى التحقق من أن خبز البرغر خالي من السمسم، وأن البطاطس المقلية لم تُقَلَ في نفس الزيت المستخدم للأسماك. شكراً لكم!</p>
+    </div>
+  </div>
+</div>
+
 <script>
   let heartClicks = [];
 
@@ -719,7 +846,7 @@
       document.getElementById('headerTag').style.display = 'block';
 
       // Skip straight to guessing destination page
-      showPage('page3');
+      showItinerary();
     }
   }
 
@@ -788,6 +915,15 @@
     document.getElementById('ticketContainer').classList.add('expanded');
     showPage('itineraryPage');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* Modal Handlers */
+  function openAllergyModal() {
+    document.getElementById('allergyModal').classList.add('active');
+  }
+
+  function closeAllergyModal(event) {
+    document.getElementById('allergyModal').classList.remove('active');
   }
 </script>
 
