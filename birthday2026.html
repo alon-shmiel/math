@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Special Reveal</title>
+  <title>35th birthday</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -15,6 +15,9 @@
       --text-muted: #64748b;
       --error: #ef4444;
       --success: #10b981;
+      --primary: #00838f;
+      --secondary: #00acc1;
+      --bg: #f4f6f8;
     }
 
     * {
@@ -54,6 +57,14 @@
       position: relative;
       overflow: hidden;
       border: 2px dashed #cbd5e1;
+      transition: all 0.5s ease;
+    }
+
+    /* Ticket expanded mode for itinerary view */
+    .ticket.expanded {
+      max-width: 800px;
+      border: none;
+      border-radius: 16px;
     }
 
     /* Boarding Ticket Notches */
@@ -69,6 +80,11 @@
     }
     .ticket::before { left: -12px; transform: translateY(-50%); }
     .ticket::after { right: -12px; transform: translateY(-50%); }
+
+    .ticket.expanded::before,
+    .ticket.expanded::after {
+      display: none;
+    }
 
     /* Header Design */
     .ticket-header {
@@ -90,7 +106,7 @@
       font-size: 1.25rem;
       font-weight: 700;
       margin-top: 0.25rem;
-      display: none; /* Hidden by default until destination page */
+      display: none;
     }
 
     .ticket-body {
@@ -234,12 +250,22 @@
       display: inline-block;
     }
 
+    .clickable-heart {
+      user-select: none;
+      transition: transform 0.1s ease;
+    }
+
+    .clickable-heart:active {
+      transform: scale(1.2);
+    }
+
     .flight-pass {
       background: #f8fafc;
       border: 2px solid #e2e8f0;
       border-radius: 12px;
       padding: 1rem;
       margin-top: 1rem;
+      margin-bottom: 1.25rem;
       text-align: left;
     }
 
@@ -262,13 +288,133 @@
       color: var(--text);
       font-family: 'Space Mono', monospace;
     }
+
+    /* Itinerary View Specific Styles */
+    .itinerary-view {
+      direction: rtl;
+      text-align: right;
+    }
+
+    .itinerary-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-align: center;
+      padding: 1.5rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .itinerary-header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+    }
+
+    .hotel-badge {
+      background: #e0f7fa;
+      border: 1px solid #b2ebf2;
+      color: #006064;
+      padding: 0.8rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .day-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+    }
+
+    .day-title {
+      font-size: 1.15rem;
+      color: var(--primary);
+      border-bottom: 2px solid #eef2f5;
+      padding-bottom: 0.5rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    .timeline {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0;
+    }
+
+    .timeline-item {
+      padding-right: 1rem;
+      margin-bottom: 1.2rem;
+      border-right: 2px solid #eef2f5;
+    }
+
+    .timeline-item.transit {
+      border-right: 2px dashed var(--secondary);
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    .attraction {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border: 1px solid #f1f5f9;
+    }
+
+    .attraction img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 0.8rem;
+    }
+
+    .attraction h3 {
+      margin: 0 0 0.5rem;
+      color: #111;
+      font-size: 1.05rem;
+    }
+
+    .attraction p {
+      color: #334155;
+      text-align: justify;
+      margin-bottom: 0.5rem;
+    }
+
+    .tag-label {
+      display: inline-block;
+      background: #fff3e0;
+      color: #e65100;
+      font-size: 0.85rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+    }
+
+    .map-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: #4285f4;
+      color: white !important;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-top: 0.8rem;
+    }
   </style>
 </head>
 <body>
 
 <div class="bg-clouds"></div>
 
-<div class="ticket">
+<div class="ticket" id="ticketContainer">
   <div id="ticketHeader" class="ticket-header">
     <h1 id="headerTitle">Birthday Edition</h1>
     <div id="headerTag" class="tag">✈️ SPECIAL TRIP REVEAL 🎂</div>
@@ -276,7 +422,7 @@
 
   <div class="ticket-body">
     <div id="page1" class="page active">
-      <div class="hero-icon">❤️</div>
+      <div class="hero-icon clickable-heart" onclick="handleHeartClick()">❤️</div>
       <h2>Quiz!</h2>
       <p>Date we met</p>
       <div class="input-group">
@@ -310,7 +456,7 @@
     <div id="page3" class="page">
       <div class="hero-icon">👋👋</div>
       <h2>Guess the destination</h2>
-      <p>Look at the image above!</p>
+      <p>Look at the image above for a clue!</p>
       <div class="input-group">
         <input type="text" id="destInput" placeholder="CITY NAME...">
         <p id="error3" class="error">Not quite! Take another guess.</p>
@@ -345,11 +491,233 @@
           </div>
         </div>
       </div>
+
+      <button onclick="showItinerary()">View Travel Itinerary 🗺️</button>
+    </div>
+
+    <!-- Itinerary View -->
+    <div id="itineraryPage" class="page itinerary-view">
+      <div class="itinerary-header">
+        <h1>תוכנית יומית (26.09 – 02.10) 🇦🇪</h1>
+      </div>
+
+      <div class="hotel-badge">
+        🏨 מלון מוצא: InterContinental Residences Dubai Business Bay
+      </div>
+
+      <!-- יום ראשון -->
+      <div class="day-card">
+        <h2 class="day-title">יום ראשון (27.09) – חקירה, מים ויער גשם מקורה</h2>
+        <ul class="timeline">
+          <li class="timeline-item transit">
+            מהמלון לוקחים מונית שתקח 10 דקות 🚕 (או אוטובוס F14/F41 שיקח 35 דקות 🚌)
+          </li>
+          <li class="timeline-item">
+            <div class="attraction">
+              <img src="https://olioli.ae/wp-content/uploads/2025/09/Water-Gallery-Sibling-activities-Dubai.webp" alt="OliOli">
+              <h3>OliOli (מוזיאון הילדים האינטראקטיבי) (בוקר)</h3>
+              <p><strong>תיאור:</strong> מתחם מקורה וממוזג באזור Al Quoz המבוסס כולו על משחק פעיל וחקירה. כולל גלריית מים (עם סילונים ותותחי מים), גלריית מכוניות ורמפות (לבנייה והסעה של מכוניות), גלריית אוויר, רשת טיפוס צבעונית ומתחם ציורים שקמים לחיים על המסך.</p>
+              <span class="tag-label">למה להזמין מראש: מכסת מבקרים מוגבלת לפי שעות.</span>
+            </div>
+          </li>
+          <li class="timeline-item transit">
+            לוקחים מונית שתקח 12 דקות 🚕
+          </li>
+          <li class="timeline-item">
+            <div class="attraction">
+              <img src="https://i.pinimg.com/1200x/8c/70/9c/8c709c069dc0e00cc5773a6b50415b92.jpg" alt="The Green Planet">
+              <h3>The Green Planet (הג'ונגל המקורה) (אחר הצהריים)</h3>
+              <p><strong>תיאור:</strong> יער גשם טרופי ממוזג בתוך מבנה זכוכית באזור City Walk. ציפורים צבעוניות עפות חופשי, עצלנים, זוחלים ומפל מים פנימי.</p>
+              <span class="tag-label">למה להזמין מראש: וויסות הכניסות והזרמת הקהל.</span>
+            </div>
+          </li>
+          <li class="timeline-item transit">
+            לוקחים מונית שתקח 12 דקות 🚕 (או אוטובוס ומטרו שיקחו 45 דקות 🚇🚌) חזרה למלון
+          </li>
+        </ul>
+        <a class="map-btn" href="https://www.google.com/maps/dir/InterContinental+Residences+Dubai+Business+Bay/OliOli®+-+Children’s+Play+Museum/The+Green+Planet+Dubai/InterContinental+Residences+Dubai+Business+Bay" target="_blank">
+          🗺️ מפה מנקודה לנקודה ב-Google Maps
+        </a>
+      </div>
+
+      <!-- יום שני -->
+      <div class="day-card">
+        <h2 class="day-title">יום שני (28.09) – מתחם דובאי מול: אקווריום, מכוניות ומזרקות</h2>
+        <ul class="timeline">
+          <li class="timeline-item transit">
+            מהמלון לוקחים מונית שתקח 8 דקות 🚕 (או אוטובוס F14 שיקח 20 דקות 🚌)
+          </li>
+          <li class="timeline-item">
+            <div class="attraction">
+              <img src="https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnjxyAG_KWBmWgXOAngHfy-DEQ_uLD9r6KQS8Nzj-QXE_nycdo_68SI1J5hpIQAdCrvGpFSLrS1VTosGbH6x7RXiAbdYHvpXVjsgeWdATEfmiLtrXQUkXl2bV2P3sLrcVFUhTXL=s1360-w1360-h1020-rw" alt="Dubai Aquarium">
+              <h3>Dubai Aquarium & Underwater Zoo (בתוך דובאי מול) (בוקר)</h3>
+              <p><strong>תיאור:</strong> מנהרת זכוכית ענקית מתחת למים המוקפת כרישים, חתולי ים ואלפי דגים. קל מאוד להתהלך בה עם עגלה.</p>
+              <span class="tag-label">למה להזמין מראש: עקיפת תורי הקופות העמוסים.</span>
+            </div>
+          </li>
+          <li class="timeline-item transit">
+            לוקחים מונית שתקח 12 דקות 🚕
+          </li>
+          <li class="timeline-item">
+            <div class="attraction">
+              <img src="https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcSQ_wYj9bJNYJa94hgyLBRYKEXPqwfIjhmdo2ancTqY8YZdqeUFXTI80RvilN6n99TZMiG4FEWrLSlRniM" alt="VIP Motors">
+              <h3>VIP Motors & Al Ain Class Motors (אולמות תצוגה ומכוניות-על) (צהריים)</h3>
+              <p><strong>תיאור:</strong> אולמות תצוגה ענקיים, ממוזגים ומפוארים שנראים כמו מוזיאון רכב. מוצגות בהם עשרות מכוניות-על אמיתיות בצבעים מרהיבים – פרארי, למבורגיני עם דלתות נפתחות למעלה, בוגאטי, מקלרן, רולס רויס וג'יפי מרצדס נינג'ה (G-Class) ענקיים.</p>
+              <span class="tag-label">למה להזמין מראש: ללא צורך בכרטיס (כניסה חופשית).</span>
+            </div>
+          </li>
+          <li class="timeline-item transit">
+            לוקחים מונית שתקח 10 דקות 🚕
+          </li>
+          <li class="timeline-item">
+            <div class="attraction">
+              <img src="https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcSEEks0acTF-2mwbjl_aTeG9ZGc1sIDcm9Vrd93c0dNp0fuD8QtksP8uXm3a_o9dq8EPEdLQysIDS4ZxbQ" alt="Dubai Fountain">
+              <h3>מופע המזרקות של דובאי (Dubai Fountain) (ערב)</h3>
+              <p><strong>תיאור:</strong> מופע המזרקות המרקדות למרגלות ה-Burj Khalifa. מוזיקה, אורות וסילוני מים ענקיים – חוויה קצרה, מרשימה וחינמית.</p>
+              <span class="tag-label">למה להזמין מראש: ללא צורך בכרטיס (חינם).</span>
+            </div>
+          </li>
+          <li class="timeline-item transit">
+            לוקחים מונית שתקח 8 דקות 🚕 (או אוטובוס F14 שיקח 20 דקות 🚌) חזרה למלון
+          </li>
+        </ul>
+        <a class="map-btn" href="https://www.google.com/maps/dir/InterContinental+Residences+Dubai+Business+Bay/Dubai+Aquarium+%26+Underwater+Zoo/VIP+MOTORS/The+Dubai+Fountain/InterContinental+Residences+Dubai+Business+Bay" target="_blank">
+          🗺️ מפה מנקודה לנקודה ב-Google Maps
+        </a>
+      </div>
+
+      <!-- יום שלישי -->
+      <div class="day-card">
+        <h2 class="day-title">יום שלישי (29.09) – פארק לגולנד ופארק מים</h2>
+        <ul class="timeline">
+          <li class="timeline-item transit">
+            מהמלון לוקחים מונית שתקח 35 דקות 🚕 (או מטרו הקו האדום ואוטובוס DPR1 שיקו 35 דקות 🚇🚌)
+          </li>
+          <li class="timeline-item">
+            <div class="attraction">
+              <img src="https://www.dubaiparksandresorts.com/sites/default/files/2024-03/legoland_duplo_express_attraction_thumbnail.webp" alt="LEGOLAND Dubai">
+              <h3>LEGOLAND Dubai (הפארק היבש) (בוקר וצהריים)</h3>
+              <p><strong>תיאור:</strong> מציע את אזור Duplo Valley המיועד במיוחד לפעוטות (גילאי 1–4) עם מתקנים נמוכים, רכבות עדינות, ומתחמי בנייה בלגו רך.</p>
+              <span class="tag-label">למה להזמין מראש: מחיר זול יותר אונליין וחיסכון בזמן.</span>
+            </div>
+          </li>
+          <li class="timeline-item transit">
+            הולכים ברגל 3 דקות 🚶
+          </li>
+          <li class="timeline-item">
+            <div class="attraction">
+              <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/11/18/0d/13/legoland-water-park.jpg?w=1800&h=-1&s=1" alt="LEGOLAND Water Park">
+              <h3>LEGOLAND Water Park (פארק המים) (אחר הצהריים)</h3>
+              <p><strong>תיאור:</strong> פארק מים נפרד המותאם במיוחד למשפחות עם ילדים צעירים. מכיל מתחמי התזה רדודים, בריכת גלים רגועה, מגלשות מים קטנות לפעוטות ואזור לבניית רפסודות מלגו צף בתוך נחל איטי.</p>
+              <span class="tag-label">למה להזמין מראש: מחיר זול יותר אונליין וחיסכון בזמן.</span>
+            </div>
+          </li>
+          <li class="timeline-item transit">
+            לוקחים מונית שתקח 35 דקות 🚕 חזרה למלון
+          </li>
+        </ul>
+        <a class="map-btn" href="https://www.google.com/maps/dir/InterContinental+Residences+Dubai+Business+Bay/LEGOLAND+Dubai/LEGOLAND+Water+Park/InterContinental+Residences+Dubai+Business+Bay" target="_blank">
+          🗺️ מפה מנקודה לנקודה ב-Google Maps
+        </a>
+      </div>
+
+      <!-- יום רביעי -->
+      <div class="day-card">
+        <h2 class="day-title">יום רביעי (30.09) – שלג במדבר וחוויות באטלנטיס</h2>
+        <ul class="timeline">
+          <li class="timeline-item transit">
+            מהמלון לוקחים מונית שתקח 15 דקות 🚕 (או מטרו הקו האדום לתחנת Mall of the Emirates שיקח 30 דקות 🚇)
+          </li>
+          <li class="timeline-item">
+            <div class="attraction">
+              <img src="https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcRfYOA5lIjFx_oOWpcgL2JO55OtDoQLdxpz0ibHu_myihOStJGvnhBj--km5WaEMfgGKBBN7PwJM0ujqew" alt="Ski Dubai">
+              <h3>Ski Dubai (סקי דובאי ב-Mall of the Emirates) (בוקר)</h3>
+              <p><strong>תיאור:</strong> מתחם Snow Park מקורה וממוזג לחוויית שלג ראשונה: משחקים בשלג, גבעות גלישה רגועות לפעוטות, מערת קרח מוארת, ומצעד פינגווינים אמיתיים.</p>
+              <span class="tag-label">למה להזמין מראש: חלונות זמן מוגבלים ומניעת המתנה בתור.</span>
+            </div>
+          </li>
+          <li class="timeline-item transit">
+            לוקחים מונית שתקח 20 דקות 🚕
+          </li>
+          <li class="timeline-item">
+            <div class="attraction">
+              <img src="https://dam.kerzner.com/i/kerzner/ATR-Kids-Club-Little-Explorers-Club?w=2880&fmt=auto" alt="Atlantis Explorers Club">
+              <h3>Atlantis Explorers Club (Little Explorers) (צהריים / אחה"כ)</h3>
+              <p><strong>תיאור:</strong> מתחם ג'ימבורי ומשחקייה רכה (Soft Play) ייעודי בתוך מועדון הילדים של המלון, המותאם במיוחד לפעוטות בגיל 3. כולל מנהרות טיפוס רכות, משחקי תחושה וסביבה ממוזגת ובטוחה לפריקת אנרגיה (בליווי הורה). חלופה נוספת: ג'ימבורי ה-Soft Play בתוך מתחם ה-Wavehouse.</p>
+              <span class="tag-label">למה להזמין מראש: תיאום כניסה מראש לאורחים שאינם לני המלון.</span>
+            </div>
+          </li>
+          <li class="timeline-item transit">
+            לוקחים מונית שתקח 25 דקות 🚕 חזרה למלון
+          </li>
+        </ul>
+        <a class="map-btn" href="https://www.google.com/maps/dir/InterContinental+Residences+Dubai+Business+Bay/Ski+Dubai/Atlantis,+The+Palm/InterContinental+Residences+Dubai+Business+Bay" target="_blank">
+          🗺️ מפה מנקודה לנקודה ב-Google Maps
+        </a>
+      </div>
+
+      <!-- יום חמישי -->
+      <div class="day-card">
+        <h2 class="day-title">יום חמישי (01.10) – אורות, דינוזאורים ופתיחת עונה</h2>
+        <ul class="timeline">
+          <li class="timeline-item">
+            <div class="attraction">
+              <h3>זמן חופשי / מנוחה / קניות (בוקר וצהריים)</h3>
+              <p><strong>תיאור:</strong> זמן חופשי לקניות, מנוחה במלון או ביקור חוזר באחד מאולמות התצוגה.</p>
+            </div>
+          </li>
+          <li class="timeline-item transit">
+            מהמלון לוקחים מונית שתקח 12 דקות 🚕 (או מטרו לתחנת Max Metro Station והליכה של 35 דקות סה"כ 🚇🚶)
+          </li>
+          <li class="timeline-item">
+            <div class="attraction">
+              <img src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcRlXRZ9UnwwCWtMwM6lbopCCZMIEnscJKYvMI7MY4mUUFXkb4nHOik-GMncEzVEPBLFUc6vEt8Du_nebcg" alt="Dubai Garden Glow">
+              <h3>Dubai Garden Glow (פתוח מה-01.10) (ערב)</h3>
+              <p><strong>תיאור:</strong> מתחם ענק מואר במיליוני נורות LED צבעוניות, כולל פסלים זוהרים, מנהרות אור, ומתחם Dinosaur Park עם דינוזאורים בגודל טבעי שזזים ומשמיעים קולות.</p>
+              <span class="tag-label">למה להזמין מראש: יום פתיחת עונה (01.10) ועומס צפוי בקופות.</span>
+            </div>
+          </li>
+          <li class="timeline-item transit">
+            לוקחים מונית שתקח 12 דקות 🚕 חזרה למלון
+          </li>
+        </ul>
+        <a class="map-btn" href="https://www.google.com/maps/dir/InterContinental+Residences+Dubai+Business+Bay/Dubai+Garden+Glow/InterContinental+Residences+Dubai+Business+Bay" target="_blank">
+          🗺️ מפה מנקודה לנקודה ב-Google Maps
+        </a>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
+  let heartClicks = [];
+
+  function handleHeartClick() {
+    const now = Date.now();
+    // Keep only timestamps within the last 3000ms (3 seconds)
+    heartClicks = heartClicks.filter(timestamp => now - timestamp < 3000);
+    heartClicks.push(now);
+
+    if (heartClicks.length >= 3) {
+      heartClicks = []; // Reset counter
+      
+      const inputField = document.getElementById('dateInput');
+      const input = inputField.value.trim();
+
+      // Check if answer is correct, or auto-fill correctly if empty/invalid
+      if (input !== '11062013') {
+        inputField.value = '11062013';
+      }
+
+      document.getElementById('error1').style.display = 'none';
+      document.getElementById('headerTitle').textContent = 'Birthday Edition';
+      document.getElementById('headerTag').style.display = 'block';
+
+      // Skip straight to guessing destination page
+      showPage('page3');
+    }
+  }
+
   function showPage(pageId) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
@@ -359,7 +727,6 @@
     const input = document.getElementById('dateInput').value.trim();
     if (input === '11062013') {
       document.getElementById('error1').style.display = 'none';
-      // Transition header title to Boarding Pass • Birthday Edition
       document.getElementById('headerTitle').textContent = 'Birthday Edition';
       startStepSequence();
     } else {
@@ -395,7 +762,6 @@
       document.getElementById('desc3').textContent = 'VIP Suite secured.';
     }, 9800);
 
-    // Show full header on Destination page
     setTimeout(() => { 
       document.getElementById('headerTag').style.display = 'block';
       showPage('page3'); 
@@ -410,6 +776,13 @@
     } else {
       document.getElementById('error3').style.display = 'block';
     }
+  }
+  
+  function showItinerary() {
+    document.getElementById('ticketHeader').style.display = 'none';
+    document.getElementById('ticketContainer').classList.add('expanded');
+    showPage('itineraryPage');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 </script>
 
