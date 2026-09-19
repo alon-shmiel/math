@@ -925,6 +925,14 @@
   function closeAllergyModal(event) {
     document.getElementById('allergyModal').classList.remove('active');
   }
+
+  // Auto-navigate to itinerary page if URL contains "?attractions"
+  document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('attractions')) {
+      showItinerary();
+    }
+  });
 </script>
 
 </body>
