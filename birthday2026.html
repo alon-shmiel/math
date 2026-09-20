@@ -417,16 +417,33 @@
       color: #991b1b;
     }
 
-    .hotel-badge {
+    .hotel-badge, .car-badge {
       background: #e0f7fa;
       border: 1px solid #b2ebf2;
       color: #006064;
       padding: 0.8rem;
       border-radius: 8px;
-      margin-bottom: 1.5rem;
+      margin-bottom: 0.75rem;
       text-align: center;
       font-weight: bold;
       font-size: 0.95rem;
+    }
+
+    .car-badge {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      margin-bottom: 1.5rem;
+    }
+
+    .car-badge a {
+      color: #b45309;
+      text-decoration: underline;
+      font-weight: 700;
+    }
+
+    .car-badge a:hover {
+      color: #78350f;
     }
 
     .day-card {
@@ -615,6 +632,10 @@
 
       <div class="hotel-badge">
         🏨 מלון מוצא: InterContinental Residences Dubai Business Bay
+      </div>
+
+      <div class="car-badge">
+        🚗 רכב שכור: Hertz – <a href="https://alon-shmiel.github.io/math/hertz.PDF" target="_blank" rel="noopener noreferrer">צפה באישור ההזמנה (PDF)</a>
       </div>
 
       <div class="day-card">
